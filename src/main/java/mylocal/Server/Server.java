@@ -7,24 +7,25 @@ import java.nio.charset.StandardCharsets;
 import java.util.Random;
 
 public class Server {
-    private static final int GIVE_SEQ =2;
-    private static final int GIVE_ACK =1;
-    private static final int PORT=3333;
+    private static final int GIVE_SEQ = 2;
+    private static final int GIVE_ACK = 1;
+    private static final int SET_SEQ = 0;
+    private static final int SET_ACK = 1;
+
+    private static final int PORT = 3333;
     private static final int SIZE_BUF = 1024;
     private static byte SEQ;
     private static byte ACK;
     private static final String sendSuccess = "Pack was delivered";
-    private static final int STARTER_SUBSTRING=0;
-    private static final int MAKING_UP_SPACE_FOR_ACK_SEQ=2;
+    private static final int MAKING_UP_SPACE_FOR_ACK_SEQ = 2;
 
-    private static final String SEQ_EQUALS =", SEQ=";
-    private static final String ACK_EQUALS = ", ACK=";
 
     private static final int RAND = 99;
-    private static final int RAND_PERCENT=50;
+    private static final int RAND_PERCENT = 50;
 
-    private static final boolean FLAG_TRUE=true;
-    private static final boolean FLAG_FALSE=false;
+    private static final boolean FLAG_TRUE = true;
+    private static final boolean FLAG_FALSE = false;
+
     public static void main(String[] args) throws IOException {
         try (DatagramSocket server = new DatagramSocket(PORT, InetAddress.getLocalHost())) {
 
@@ -33,12 +34,9 @@ public class Server {
                 byte[] buf = new byte[SIZE_BUF];
                 DatagramPacket gotPack = new DatagramPacket(buf, buf.length);
                 server.receive(gotPack);
-                String message = new String(buf);
-                message = message.substring(STARTER_SUBSTRING, gotPack.getLength() - MAKING_UP_SPACE_FOR_ACK_SEQ);
-                SEQ = buf[gotPack.getLength() - GIVE_SEQ];
-                ACK = buf[gotPack.getLength() - GIVE_ACK];
-
-                System.out.println(message + SEQ_EQUALS + SEQ + ACK_EQUALS + ACK);
+                byte[] giverSeqACK = PackageOutputToConsole.printThePackageToTheConsole(gotPack);
+                SEQ = giverSeqACK[SET_SEQ];
+                ACK = giverSeqACK[SET_ACK];
 
                 boolean wasReceived = FLAG_TRUE;
                 Random rnd80 = new Random();
